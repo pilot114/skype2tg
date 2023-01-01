@@ -1,0 +1,15 @@
+{
+    "require": {
+        "guzzlehttp/guzzle": "^7.5",
+        "longman/telegram-bot": "^0.80.0",
+        "ext-pcntl": "*"
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "SkypeToTelegram\\": "src/"
+        }
+    }
+}
