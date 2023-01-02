@@ -14,17 +14,19 @@ $botName = 'Pilot114_pybot';
 $chatId = 859029886;
 
 $skype = new Skype($authHeader, $endpointHeader, $cookieForApi);
+//$skype->setDebug(true);
 $tg = new Telegram($botApiKey, $botName);
 
 foreach ($skype->listenEvents(1000) as $event) {
     $message = $skype->formatEvent($event);
-    if (!is_null($message)) {
-        if ($message->text) {
-            $tg->sendText($chatId, $message->text);
-        }
-        foreach ($message->images as $image) {
-            $imgData = base64_decode($image);
-            $tg->sendImage($chatId, $image);
-        }
+    if (is_null($message)) {
+        continue;
+    }
+    if ($message->text) {
+        $tg->sendText($chatId, $message->text);
+    }
+    foreach ($message->images as $image) {
+        $imgData = base64_decode($image);
+        $tg->sendImage($chatId, $image);
     }
 }

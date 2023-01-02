@@ -9,6 +9,7 @@ class Skype
     protected string $entryPoint;
     protected Client $client;
     protected array $options = [];
+    protected bool $isDebug = false;
 
     public function __construct(
         protected string $authHeader,
@@ -31,11 +32,9 @@ class Skype
         ]);
     }
 
-    protected function callPost(string $url): array
+    public function setDebug(bool $isDebug)
     {
-        $response = $this->client->post($url, $this->options);
-        $data = $response->getBody()->getContents();
-        return json_decode($data, true)['eventMessages'] ?? [];
+        $this->isDebug = $isDebug;
     }
 
     public function getLocalImageName(string $url): string
@@ -43,10 +42,9 @@ class Skype
         $this->options['headers']['Cookie'] = $this->cookieForApi;
         $response = $this->client->get($url, $this->options);
         $data = $response->getBody()->getContents();
-        $fileId = uniqid();
-        $fileName = "./cache/$fileId.jpeg";
-        file_put_contents($fileName, $data);
-        return $fileName;
+        $file = tmpfile();
+        fwrite($file, $data);
+        return stream_get_meta_data($file)['uri'];
     }
 
     # т.к. данные получаем постранично, может быть получено >= $count событий
@@ -69,6 +67,13 @@ class Skype
 
     public function formatEvent(array $event): ?SkypeMessage
     {
-        return (new SkypePrinter($this))->formatEvent($event);
+        return (new SkypePrinter($this))->formatEvent($event, $this->isDebug);
+    }
+
+    protected function callPost(string $url): array
+    {
+        $response = $this->client->post($url, $this->options);
+        $data = $response->getBody()->getContents();
+        return json_decode($data, true)['eventMessages'] ?? [];
     }
 }
