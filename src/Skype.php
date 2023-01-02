@@ -52,10 +52,11 @@ class Skype
     {
         $this->options['timeout'] = 90.0;
         $id = 1000;
+        $subscriptionId = 1;
 
         $eventIndex = 0;
         while($eventIndex < $count) {
-            $url = "/v1/users/ME/endpoints/$this->entryPoint/subscriptions/0/poll?ackId=$id";
+            $url = "/v1/users/ME/endpoints/$this->entryPoint/subscriptions/$subscriptionId/poll?ackId=$id";
             $events = $this->callPost($url);
             foreach ($events as $event) {
                 $id = $event['id'];
